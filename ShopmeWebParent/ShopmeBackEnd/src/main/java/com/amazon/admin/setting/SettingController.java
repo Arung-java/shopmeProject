@@ -1,0 +1,120 @@
+package com.amazon.admin.setting;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.amazon.admin.AmazonS3Util;
+import com.amazon.admin.FileUploadUtil;
+import com.amazon.common.constants.Constants;
+import com.amazon.common.entity.Currency;
+import com.amazon.common.entity.setting.Setting;
+import com.amazon.common.entity.setting.SettingBag;
+
+@Controller
+public class SettingController {
+	@Autowired
+	private SettingService service;
+	@Autowired
+	private CurrenyRepository repo;
+
+	@GetMapping("/settings")
+	public String listAll(Model model) {
+		List<Setting> listSettings = service.listAllSettings();
+		List<Currency> listCurrencies = repo.findAllByOrderByNameAsc();
+		model.addAttribute("listCurrencies", listCurrencies);
+
+		for (Setting setting : listSettings) {
+			model.addAttribute(setting.getKey(), setting.getValue());
+		}
+		model.addAttribute("S3_BASE_URI",Constants.S3_BASE_URI);
+		return "settings/settings";
+
+	}
+
+	@PostMapping("/settings/save_general")
+	public String saveGeneralSettings(@RequestParam("fileImage") MultipartFile multipartFile,
+			HttpServletRequest request, RedirectAttributes ra) throws IOException {
+		GeneralSettingBag settingBag = service.getGeneralSettings();
+		saveSiteLogo(multipartFile, settingBag);
+		saveCurrencySymbol(request, settingBag);
+
+		updateSettingValuesForm(request, settingBag.list());
+		ra.addFlashAttribute("message", "General settings have been saved. ");
+		return "redirect:/settings";
+
+	}
+
+	private void saveSiteLogo(MultipartFile multipartFile, GeneralSettingBag settingBag) throws IOException {
+		if (!multipartFile.isEmpty()) {
+			String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+			String value = "/site-logo/" + fileName;
+			settingBag.updateSiteLogo(value);
+			String uploadDir = "site-logo";
+			AmazonS3Util.removeFolder(uploadDir);
+			AmazonS3Util.uploadFile(uploadDir, fileName, multipartFile.getInputStream());
+			//FileUploadUtil.cleanDir(uploadDir);
+			//FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+		}
+	}
+
+	private void saveCurrencySymbol(HttpServletRequest request, GeneralSettingBag settingBag) {
+		Integer currencyId = Integer.parseInt(request.getParameter("CURRENCY_ID"));
+		Optional<Currency> findByIdResult = repo.findById(currencyId);
+		if (findByIdResult.isPresent()) {
+			Currency currency = findByIdResult.get();
+
+			settingBag.updateCurrencySymbol(currency.getSymbol());
+		}
+	}
+
+	private void updateSettingValuesForm(HttpServletRequest request, List<Setting> listSetting) {
+		for (Setting setting : listSetting) {
+			String value = request.getParameter(setting.getKey());
+			if (value != null) {
+				setting.setValue(value);
+			}
+
+		}
+		service.saveAll(listSetting);
+	}
+
+	@PostMapping("/settings/save_mail_server")
+	public String saveMailServerSettings(HttpServletRequest request, RedirectAttributes ra) throws IOException {
+		List<Setting> mailServerSettings = service.getMailServerSettings();
+
+		updateSettingValuesForm(request, mailServerSettings);
+		ra.addFlashAttribute("message", "Mail server settings have been saved. ");
+		return "redirect:/settings#mailServer";
+	}
+
+	@PostMapping("/settings/save_mail_templates")
+	public String saveMailTemplateSettings(HttpServletRequest request, RedirectAttributes ra) throws IOException {
+		List<Setting> mailTemplateSettings = service.getMailTemplateSettings();
+
+		updateSettingValuesForm(request, mailTemplateSettings);
+		ra.addFlashAttribute("message", "Mail Template settings have been saved. ");
+		return "redirect:/settings#mailTemplates";
+	}
+
+	@PostMapping("/settings/save_payment")
+	public String savePaymentSettings(HttpServletRequest request, RedirectAttributes ra) throws IOException {
+		List<Setting> paymentSettings = service.getPaymentSettings();
+
+		updateSettingValuesForm(request, paymentSettings);
+		ra.addFlashAttribute("message", "Payment settings have been saved. ");
+		return "redirect:/settings#payment";
+	}
+}
