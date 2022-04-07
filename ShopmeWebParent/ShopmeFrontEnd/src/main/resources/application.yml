@@ -6,13 +6,14 @@ server:
     
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    password: root
-    url: jdbc:mysql://localhost:3306/shopmedb
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    password: Nani$1234
+    url: jdbc:mysql://mydb.cgvancr7ky2p.us-east-1.rds.amazonaws.com:3306/shopmedb
     username: root
-    hikari:
-      minimum-idle: 1
-      maximum-pool-size: 2
+    
+   # hikari:
+     # minimum-idle: 1
+      #maximum-pool-size: 2
   jpa:
     hibernate:
       ddl-auto: update

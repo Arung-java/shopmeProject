@@ -3,10 +3,9 @@ package com.amazon.admin.shippingrate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.amazon.admin.paging.PagingAndSortingHelper;
 import com.amazon.admin.product.ProductRepository;

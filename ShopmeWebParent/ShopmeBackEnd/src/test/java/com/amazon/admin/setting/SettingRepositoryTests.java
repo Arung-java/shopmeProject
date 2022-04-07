@@ -26,7 +26,7 @@ public class SettingRepositoryTests {
 	//	Setting siteName=new Setting("SITE_NAME", "Shopme", SettingCategory.GENERAL);
 		Setting siteLogo=new Setting("SITE_LOGO", "Shopme.png", SettingCategory.GENERAL);
 		Setting copyright=new Setting("SITE_COPYRIGHT", "Copyright (c) 2022 Shopme LTD.", SettingCategory.GENERAL);
-		repo.saveAll(List.of(siteLogo,copyright));
+		//repo.saveAll(List.of(siteLogo,copyright));
 		Iterable<Setting> iterable = repo.findAll();
 		
 		assertThat(iterable).size().isGreaterThanOrEqualTo(0);
@@ -41,7 +41,7 @@ public class SettingRepositoryTests {
 		Setting decimalPointType=new Setting("DECIMAL_POINT_TYPE", "POINT", SettingCategory.CURRENCY);
 		Setting decimalDigits=new Setting("DECIMAL_DIGITS", "2", SettingCategory.CURRENCY);
 		Setting thousandsPointType=new Setting("THOUSANDS_POINT_TYPE", "COMMA", SettingCategory.CURRENCY);
-		repo.saveAll(List.of(currenyId,symbol,symbolPosition,decimalPointType,decimalDigits,thousandsPointType));
+		//repo.saveAll(List.of(currenyId,symbol,symbolPosition,decimalPointType,decimalDigits,thousandsPointType));
 		Iterable<Setting> iterable = repo.findAll();
 		
 		assertThat(iterable).size().isGreaterThanOrEqualTo(0);

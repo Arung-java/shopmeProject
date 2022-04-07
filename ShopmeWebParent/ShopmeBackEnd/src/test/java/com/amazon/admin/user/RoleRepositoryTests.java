@@ -36,7 +36,7 @@ public class RoleRepositoryTests {
 		Role roleShipper=new Role("Shipper", "View products, view orders"
 				+" and update order status");
 		Role roleAssistant=new Role("Assistant", "manage question and reviews");
-		roleRepository.saveAll(List.of(roleSalesPerson,roleEditor,roleShipper,roleAssistant));
+	//	roleRepository.saveAll(List.of(roleSalesPerson,roleEditor,roleShipper,roleAssistant));
 	//assertThat(savedRole.getId()).isGreaterThan(0);
 		
 	}
